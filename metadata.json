@@ -1,0 +1,6 @@
+{
+  "name": "DZt Tv",
+  "description": "A elegant and modern live streaming TV app with smooth player control, custom categorization, dark mode optimization, and instant playback of IPTV channels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

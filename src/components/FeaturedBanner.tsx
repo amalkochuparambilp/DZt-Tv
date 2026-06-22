@@ -1,26 +1,13 @@
-import { useState, useEffect } from "react";
-import { Play, Flame, User, Calendar, Eye } from "lucide-react";
+import { Play, Flame, User, Calendar } from "lucide-react";
 import { TVChannel } from "../types";
 
 interface FeaturedBannerProps {
   onPlayFeatured: () => void;
   channel: TVChannel;
+  viewerCount?: number;
 }
 
-export default function FeaturedBanner({ onPlayFeatured, channel }: FeaturedBannerProps) {
-  const [viewers, setViewers] = useState(142385);
-  const [totalViews, setTotalViews] = useState(3847291);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Dynamic fluctuating spectator traffic simulation
-      setViewers(prev => prev + Math.floor(Math.random() * 41) - 18);
-      setTotalViews(prev => prev + Math.floor(Math.random() * 4) + 1);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+export default function FeaturedBanner({ onPlayFeatured, channel, viewerCount }: FeaturedBannerProps) {
   return (
     <div id="featured-banner-root" className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-900 border border-blue-500/20 shadow-[0_0_40px_rgba(30,41,59,0.25)]">
       {/* Visual glowing layout elements */}
@@ -37,13 +24,15 @@ export default function FeaturedBanner({ onPlayFeatured, channel }: FeaturedBann
               HOT EVENT
             </span>
             <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-blue-900/40 border border-blue-800/30 text-blue-300 text-xs font-semibold">
-              <Flame className="w-3.5 h-3.5 text-yellow-400 font-bold" />
+              <Flame className="w-3.5 h-3.5 text-yellow-400" />
               FIFA World Stream
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-semibold">
-              <Eye className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-              {viewers >= 1000 ? `${(viewers / 1000).toFixed(1)}k+ views` : `${viewers.toLocaleString()} views`}
-            </span>
+            {viewerCount !== undefined && (
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {viewerCount.toLocaleString()} Watching
+              </span>
+            )}
           </div>
 
           {/* Banner Title */}
@@ -56,7 +45,7 @@ export default function FeaturedBanner({ onPlayFeatured, channel }: FeaturedBann
           </p>
 
           {/* Quick Stats Grid */}
-          <div className="flex flex-wrap gap-3 mb-6 text-xs text-slate-400 font-mono">
+          <div className="flex gap-4 mb-6 text-xs text-slate-400 font-mono">
             <div className="flex items-center gap-1.5 bg-slate-950/40 py-1.5 px-3 rounded-lg border border-slate-800/60">
               <User className="w-3.5 h-3.5 text-blue-400" />
               <span>Multi-angle Audio</span>
@@ -64,10 +53,6 @@ export default function FeaturedBanner({ onPlayFeatured, channel }: FeaturedBann
             <div className="flex items-center gap-1.5 bg-slate-950/40 py-1.5 px-3 rounded-lg border border-slate-800/60">
               <Calendar className="w-3.5 h-3.5 text-blue-400" />
               <span>Low Latency</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-slate-950/40 py-1.5 px-3 rounded-lg border border-slate-800/60">
-              <Eye className="w-3.5 h-3.5 text-blue-400" />
-              <span>{totalViews.toLocaleString()} total views</span>
             </div>
           </div>
 
@@ -99,8 +84,14 @@ export default function FeaturedBanner({ onPlayFeatured, channel }: FeaturedBann
               {channel.name}
             </h4>
             <div className="flex items-center justify-between text-[11px] text-slate-500">
-              <span>Category: {channel.category}</span>
-              <span className="text-blue-400 font-semibold font-mono">1080p stream</span>
+              <span>{channel.category}</span>
+              {viewerCount !== undefined ? (
+                <span className="text-blue-400 font-semibold font-mono">
+                  {viewerCount.toLocaleString()} views
+                </span>
+              ) : (
+                <span className="text-blue-400 font-semibold font-mono">1080p stream</span>
+              )}
             </div>
           </div>
         </div>

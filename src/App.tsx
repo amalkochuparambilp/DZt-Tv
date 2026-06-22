@@ -29,6 +29,41 @@ export default function App() {
     { name: "Science & Tech", count: 1 }
   ]);
   const [activeChannel, setActiveChannel] = useState<TVChannel>(FIFA_CHANNEL);
+  const [fifaViews, setFifaViews] = useState<number>(1);
+
+  useEffect(() => {
+    const target = Math.floor(Math.random() * 200) + 9750; // target between 9750 and 9950
+    let current = 1;
+    const duration = 2500; // 2.5s rollup
+    const intervalTime = 30; // 30ms step transition
+    const totalSteps = duration / intervalTime;
+    const stepIncrement = (target - 1) / totalSteps;
+
+    const rollupTimer = setInterval(() => {
+      current += stepIncrement;
+      if (current >= target) {
+        clearInterval(rollupTimer);
+        setFifaViews(target);
+
+        // Begin subtle live fluctuation updates every 3 seconds
+        const fluctuationTimer = setInterval(() => {
+          setFifaViews(prev => {
+            const change = Math.floor(Math.random() * 21) - 10; // -10 to +10 viewers change
+            const newValue = prev + change;
+            if (newValue >= 10000) return 9990;
+            if (newValue < 9500) return 9510;
+            return newValue;
+          });
+        }, 3000);
+
+        return () => clearInterval(fluctuationTimer);
+      } else {
+        setFifaViews(Math.floor(current));
+      }
+    }, intervalTime);
+
+    return () => clearInterval(rollupTimer);
+  }, []);
   
   // Filtering & Pagination state
   const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -244,7 +279,7 @@ export default function App() {
           
           {/* Main Video play Stage (Left, large layout span) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
-            <VideoPlayer channel={activeChannel} />
+            <VideoPlayer channel={activeChannel} viewerCount={fifaViews} />
             
             {/* Stream detailed panel */}
             <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-900 flex justify-between items-center text-xs flex-wrap gap-3">
@@ -298,7 +333,10 @@ export default function App() {
                 </div>
                 <div className="min-w-0">
                   <span className="text-[9px] font-mono font-extrabold text-blue-400 uppercase tracking-widest block mb-0.5">FIFA Stream</span>
-                  <p className="text-xs text-white truncate font-semibold leading-tight">Featured Soccer Match Live</p>
+                  <p className="text-xs text-emerald-400 font-bold truncate leading-tight flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{fifaViews.toLocaleString()} Watching</span>
+                  </p>
                 </div>
               </div>
               <button
@@ -313,7 +351,7 @@ export default function App() {
         </div>
 
         {/* Featured Big Banner Billboard Row */}
-        <FeaturedBanner onPlayFeatured={handlePlayFeatured} channel={FIFA_CHANNEL} />
+        <FeaturedBanner onPlayFeatured={handlePlayFeatured} channel={FIFA_CHANNEL} viewerCount={fifaViews} />
 
         {/* Channels directory section header */}
         <div ref={channelsListRef} className="border-t border-slate-900 pt-8 flex flex-col gap-6">
@@ -429,6 +467,7 @@ export default function App() {
                   }}
                   isFavorite={favorites.some(f => f.url === chan.url)}
                   onToggleFavorite={handleToggleFavorite}
+                  viewerCount={fifaViews}
                 />
               ))}
             </div>

@@ -9,6 +9,7 @@ export interface ChannelCardProps {
   onSelect: (channel: TVChannel) => void;
   isFavorite: boolean;
   onToggleFavorite: (e: MouseEvent, channel: TVChannel) => void;
+  viewerCount?: number;
 }
 
 export default function ChannelCard({ 
@@ -16,7 +17,8 @@ export default function ChannelCard({
   isSelected, 
   onSelect,
   isFavorite,
-  onToggleFavorite
+  onToggleFavorite,
+  viewerCount
 }: ChannelCardProps): React.JSX.Element {
   return (
     <div
@@ -72,8 +74,17 @@ export default function ChannelCard({
             {channel.name}
           </h4>
           <p className="text-[11px] text-slate-500 font-mono mt-0.5 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-700 animate-pulse" />
-            <span>Ready stream</span>
+            {channel.id === 'fifa-live' && viewerCount !== undefined ? (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-emerald-400 font-semibold">{viewerCount.toLocaleString()} watching</span>
+              </>
+            ) : (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-700 animate-pulse" />
+                <span>Ready stream</span>
+              </>
+            )}
           </p>
         </div>
       </div>

@@ -2,15 +2,16 @@ import { useEffect, useRef, useState, MouseEvent, ChangeEvent } from "react";
 import Hls from "hls.js";
 import { 
   Play, Pause, Volume2, VolumeX, Maximize, Minimize, 
-  RotateCw, AlertOctagon, Activity, Radio, Info, Eye 
+  RotateCw, AlertOctagon, Activity, Radio, Info 
 } from "lucide-react";
 import { TVChannel } from "../types";
 
 interface VideoPlayerProps {
   channel: TVChannel;
+  viewerCount?: number;
 }
 
-export default function VideoPlayer({ channel }: VideoPlayerProps) {
+export default function VideoPlayer({ channel, viewerCount }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -27,29 +28,6 @@ export default function VideoPlayer({ channel }: VideoPlayerProps) {
     resolution: "Auto",
     type: "HLS"
   });
-  const [viewers, setViewers] = useState<number>(0);
-
-  useEffect(() => {
-    // Generate realistic viewer counts based on channel info (ensuring everyone has a 10K+ active viewership)
-    let baseCount = 12450;
-    if (channel.id === "fifa-live" || channel.name.toLowerCase().includes("fifa")) {
-      baseCount = 142385;
-    } else if (channel.category.toLowerCase().includes("sport")) {
-      baseCount = 45200 + Math.floor(Math.random() * 8000);
-    } else if (channel.category.toLowerCase().includes("news")) {
-      baseCount = 18450 + Math.floor(Math.random() * 4000);
-    } else {
-      baseCount = 11200 + Math.floor(Math.random() * 3500);
-    }
-    setViewers(baseCount);
-
-    const interval = setInterval(() => {
-      // Fluctuating spectator traffic simulation
-      setViewers(prev => prev + Math.floor(Math.random() * 19) - 9);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [channel.id, channel.url]);
 
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -346,11 +324,13 @@ export default function VideoPlayer({ channel }: VideoPlayerProps) {
           </div>
 
           {/* Indicators right side */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[10px] font-mono font-bold uppercase">
-              <Eye className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-              <span>{viewers >= 1000 ? `${(viewers / 1000).toFixed(1)}k+ views` : `${viewers.toLocaleString()} views`}</span>
-            </span>
+          <div className="flex items-center gap-2">
+            {channel.id === 'fifa-live' && viewerCount !== undefined && (
+              <span className="shrink-0 flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{viewerCount.toLocaleString()} Watching</span>
+              </span>
+            )}
             <span className="shrink-0 flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
               LIVE
